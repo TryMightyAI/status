@@ -1,0 +1,55 @@
+diff --git a/src/components/LiveStatus.svelte b/src/components/LiveStatus.svelte
+index 16eec5d..e266005 100644
+--- a/src/components/LiveStatus.svelte
++++ b/src/components/LiveStatus.svelte
+@@ -17 +16,0 @@
+-  const graphsBaseUrl = `${userContentBaseUrl}/${owner}/${repo}/master/graphs`;
+@@ -24 +23 @@
+-      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/master/history/summary.json`);
++      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/main/history/summary.json`);
+@@ -101,14 +100,2 @@
+-      <article
+-        class={`${site.status} link graph`}
+-        style="--background: url('{`${graphsBaseUrl}/${site.slug}/response-time${
+-          selected === "day"
+-            ? "-day"
+-            : selected === "week"
+-            ? "-week"
+-            : selected === "month"
+-            ? "-month"
+-            : selected === "year"
+-            ? "-year"
+-            : ""
+-        }.png`}')"
+-        ><h4>
++      <article class={`${site.status} link`}>
++        <h4>
+@@ -156,6 +142,0 @@
+-  article.graph {
+-    background-image: var(--background);
+-    background-size: contain;
+-    background-repeat: no-repeat;
+-    background-position: center right;
+-  }
+diff --git a/src/components/Summary.svelte b/src/components/Summary.svelte
+index 97ee5bc..8f510de 100644
+--- a/src/components/Summary.svelte
++++ b/src/components/Summary.svelte
+@@ -20 +20 @@
+-      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/master/history/summary.json`);
++      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/main/history/summary.json`);
+diff --git a/src/routes/_layout.svelte b/src/routes/_layout.svelte
+index 74c6a4a..2e411f8 100644
+--- a/src/routes/_layout.svelte
++++ b/src/routes/_layout.svelte
+@@ -45,7 +44,0 @@
+-  <link
+-    rel="icon"
+-    type="image/svg"
+-    href={(config["status-website"] || {}).faviconSvg ||
+-      (config["status-website"] || {}).favicon ||
+-      `https://raw.githubusercontent.com/upptime/upptime/master/assets/upptime-icon.svg`}
+-  />
+@@ -55 +48 @@
+-    href={(config["status-website"] || {}).favicon || `/logo-192.png`}
++    href={(config["status-website"] || {}).favicon || `/mighty-logo.png`}

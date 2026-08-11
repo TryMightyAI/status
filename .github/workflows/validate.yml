@@ -1,30 +1,43 @@
 # Hardened from Upptime v1.43.13. Review upgrades through UPSTREAM.md;
 # status-page source and all Actions are pinned to immutable revisions.
-name: Static Site CI
+name: Validate
 
 on:
-  schedule:
-    - cron: "27 1 * * *"
+  pull_request:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.repository }}-upptime-static-site
-  cancel-in-progress: false
+  group: ${{ github.repository }}-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  release:
-    name: Build and publish static site
-    if: github.ref == 'refs/heads/main' && vars.STATUS_AUTOMATION_ENABLED == 'true'
+  config:
+    name: Validate status configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Validate
+        run: ruby scripts/validate.rb
+
+  static-site:
+    name: Build static site
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       - name: Checkout status repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          ref: main
           persist-credentials: false
       - name: Checkout pinned Upptime status page
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -57,11 +70,3 @@ jobs:
           test -s site/__sapper__/export/_headers
           test -f site/__sapper__/export/mighty-logo.png
           test "$(wc -c < site/__sapper__/export/mighty-logo.png)" -gt 1000
-      - name: Publish gh-pages branch
-        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4
-        with:
-          github_token: ${{ secrets.GH_PAT }}
-          publish_dir: site/__sapper__/export/
-          force_orphan: "false"
-          user_name: Mighty Status Bot
-          user_email: 73812536+upptime-bot@users.noreply.github.com
