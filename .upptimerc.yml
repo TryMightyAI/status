@@ -10,6 +10,9 @@ secrets: []
 
 delay: 1000
 skipDeleteIssues: true
+skipDescriptionUpdate: true
+skipTopicsUpdate: true
+skipHomepageUpdate: true
 
 sites:
   - name: Website

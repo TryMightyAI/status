@@ -16,6 +16,9 @@ check(config["owner"] == "TryMightyAI", "owner must be TryMightyAI")
 check(config["repo"] == "status", "repo must be status")
 check(config["secrets"] == [], "monitor secret allowlist must remain explicit and empty")
 check(config["skipDeleteIssues"] == true, "short incidents must be retained")
+%w[skipDescriptionUpdate skipTopicsUpdate skipHomepageUpdate].each do |key|
+  check(config[key] == true, "#{key}: automation must not rewrite repository metadata")
+end
 check(config.dig("status-website", "cname") == "status.trymighty.ai", "custom domain changed")
 check(config.dig("status-website", "logoUrl") == "/mighty-logo.png", "logo must be served with the static page")
 
@@ -74,6 +77,8 @@ runtime_workflows.each do |name|
         "#{name}: production automation needs the explicit launch gate")
   check(!content.include?("pull_request_target"), "#{name}: pull_request_target is forbidden")
   check(!content.include?("repository_dispatch"), "#{name}: repository_dispatch is not required")
+  check(!content.include?("GH_PAT"), "#{name}: long-lived PATs are forbidden")
+  check(!content.include?("secrets."), "#{name}: production jobs must not consume repository secrets")
 
   content.scan(/^\s*uses:\s*([^\s#]+)/).flatten.each do |action|
     next if action.start_with?("./")
@@ -95,7 +100,16 @@ check(File.read("patches/upptime-status-page-main.patch").scan("/master/").lengt
   content = File.read(File.join(workflow_dir, name))
   check(content.include?("group: ${{ github.repository }}-upptime-main-writer"),
         "#{name}: main writers must share one concurrency group")
+  check(content.include?("      contents: write
+      issues: write"),
+        "#{name}: ephemeral token needs only Contents/Issues write")
+  check(content.include?("GITHUB_TOKEN: ${{ github.token }}"),
+        "#{name}: monitor must use the ephemeral job token")
 end
+check(site_content.include?("      contents: write"),
+      "site.yml: publisher needs job-scoped Contents write")
+check(site_content.include?("github_token: ${{ github.token }}"),
+      "site.yml: publisher must use the ephemeral job token")
 
 check(!File.read("README.md").include?("<!--start: status pages-->"),
       "README summary markers would generate links to intentionally omitted PNG graphs")

@@ -16,6 +16,9 @@ concurrency:
 
 jobs:
   release:
+    permissions:
+      contents: write
+      issues: write
     name: Check public endpoints
     if: github.ref == 'refs/heads/main' && vars.STATUS_AUTOMATION_ENABLED == 'true'
     runs-on: ubuntu-latest
@@ -25,11 +28,11 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           ref: main
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ github.token }}
       - name: Check endpoint status
         uses: upptime/uptime-monitor@4fec88256b5917a2ed07a088df6e205869b424d6 # v1.43.13
         with:
           command: update
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
           SECRETS_CONTEXT: "{}"

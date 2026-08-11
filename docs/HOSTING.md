@@ -27,30 +27,30 @@ Every production job has a checked-in launch gate:
 false while the launch pull request is under review. The read-only `Validate`
 workflow may run on the pull request; it builds but never publishes the site.
 
+Production does **not** need a stored personal access token. Each enabled job
+requests only the short-lived repository token permissions it needs: Contents
+and Issues write for monitoring, or Contents write for static publication.
+GitHub expires that token after the job. Commits made with it intentionally do
+not chain into other workflows; live status and Issues are read at page load,
+and the static shell has its own schedule.
+
 1. Confirm `STATUS_AUTOMATION_ENABLED` is absent/false, then review and merge the
    launch pull request. Scheduled jobs will skip safely while the gate is off.
-2. Prefer a dedicated bot/machine user protected with MFA. Create a
-   **fine-grained, expiring** GitHub token limited to `TryMightyAI/status` with
-   read/write access to Contents and Issues only (Metadata read is implicit).
-   The hardened workflows do not need Actions or Workflows write access.
-   Upptime calls this secret `GH_PAT`.
-3. Store it as the repository Actions secret `GH_PAT`. Record the owner,
-   approval, expiry, and rotation date in Mighty’s approved credential register;
-   do not put the token in an Issue, commit, or Cloudflare variable.
-4. Keep the repository's default `GITHUB_TOKEN` permission read-only and keep
-   “Allow GitHub Actions to create and approve pull requests” disabled. Keep the
-   Actions allowlist limited to GitHub-owned actions plus the two exact
+2. Keep the repository's default `GITHUB_TOKEN` permission read-only and keep
+   “Allow GitHub Actions to create and approve pull requests” disabled. Do not
+   add a `GH_PAT` secret.
+3. Keep the Actions allowlist limited to GitHub-owned actions plus the two exact
    commit-SHA patterns recorded in the workflows; never switch it to “allow all.”
-5. Verify GitHub private vulnerability reporting is enabled and the private
+4. Verify GitHub private vulnerability reporting is enabled and the private
    advisory URL works for a non-admin reporter.
-6. Create the `maintenance` label if it does not exist.
-7. Run `Validate`. Only after the secret, label, and security checks pass,
-   enable the three production workflows and set the repository variable
+5. Create the `maintenance` label if it does not exist.
+6. Run `Validate`. Only after the label and security checks pass, enable the
+   three production workflows and set the repository variable
    `STATUS_AUTOMATION_ENABLED` to exactly `true`.
-8. Manually trigger these workflows in order: `Uptime CI`, `Response Time CI`,
+7. Manually trigger these workflows in order: `Uptime CI`, `Response Time CI`,
    and `Static Site CI`. To pause safely, set the variable to `false` before
-   rotating the token or changing automation.
-9. Confirm that `history/` and the `gh-pages` branch contain only Mighty data.
+   changing automation.
+8. Confirm that `history/` and the `gh-pages` branch contain only Mighty data.
    Never import the upstream demo measurements.
 
 ## Cloudflare Pages (recommended)
@@ -115,8 +115,8 @@ Do not claim the status-page control is operating until this test is complete.
 
 - Monitor the status page itself from a service that does not depend on
   Cloudflare Pages or this repository's scheduler.
-- Review repository access and the bot token at the organization’s approved
-  cadence; remove leavers promptly and rotate before token expiry.
+- Review repository access and workflow job permissions at the organization’s
+  approved cadence; remove leavers promptly.
 - Review Cloudflare Pages project access and deployment history.
 - Export the repository and Issue/comment audit population for each SOC 2
   review period. A screenshot alone is weak evidence.

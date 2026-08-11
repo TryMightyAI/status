@@ -22,9 +22,10 @@ status page's integrity. Mighty instead:
 3. patches the old static client to read Mighty’s `main` branch and removes its
    optional pre-rendered PNG graph dependency (history charts still render from
    Git commits in the browser);
-4. passes no monitor credentials (`secrets: []`);
-5. limits the status automation token to this repository with Contents/Issues
-   write only;
+4. passes no monitor credentials (`secrets: []`) and stores no long-lived
+   automation token;
+5. uses GitHub’s short-lived job token with only Contents/Issues write for the
+   monitor and Contents write for static publication;
 6. reviews upstream changes in a pull request; and
 7. runs `ruby scripts/validate.rb` plus a no-publish static build before merging.
 
