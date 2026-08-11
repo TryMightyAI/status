@@ -38,7 +38,9 @@ workflow may run on the pull request; it builds but never publishes the site.
    approval, expiry, and rotation date in Mighty’s approved credential register;
    do not put the token in an Issue, commit, or Cloudflare variable.
 4. Keep the repository's default `GITHUB_TOKEN` permission read-only and keep
-   “Allow GitHub Actions to create and approve pull requests” disabled.
+   “Allow GitHub Actions to create and approve pull requests” disabled. Keep the
+   Actions allowlist limited to GitHub-owned actions plus the two exact
+   commit-SHA patterns recorded in the workflows; never switch it to “allow all.”
 5. Verify GitHub private vulnerability reporting is enabled and the private
    advisory URL works for a non-admin reporter.
 6. Create the `maintenance` label if it does not exist.
