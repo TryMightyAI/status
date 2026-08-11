@@ -1,31 +1,78 @@
-# Change these first
-owner: upptime # Your GitHub organization or username, where this repository lives
-repo: upptime # The name of this repository
+# Mighty public status configuration.
+# Upptime configuration reference: https://upptime.js.org/docs/configuration
+owner: TryMightyAI
+repo: status
+user-agent: TryMightyAI
+
+# Public checks use no credentials. Keep this explicit allowlist empty unless a
+# separately reviewed change introduces a narrowly scoped secret.
+secrets: []
+
+delay: 1000
+skipDeleteIssues: true
+skipDescriptionUpdate: true
+skipTopicsUpdate: true
+skipHomepageUpdate: true
 
 sites:
-  - name: Google
-    url: https://www.google.com
-  - name: Wikipedia
-    url: https://en.wikipedia.org
-  - name: Hacker News
-    url: https://news.ycombinator.com
-  - name: Secret Site
-    url: $SECRET_SITE
+  - name: Website
+    slug: website
+    url: https://trymighty.ai/
+    method: GET
+    expectedStatusCodes:
+      - 200
+    maxResponseTime: 5000
+  - name: API
+    slug: api
+    url: https://api.trymighty.ai/health
+    method: GET
+    expectedStatusCodes:
+      - 200
+    maxResponseTime: 5000
+    __dangerous__body_down_if_text_missing: '"status":"healthy"'
+  - name: Scan Gateway
+    slug: scan-gateway
+    url: https://gateway.trymighty.ai/health
+    method: GET
+    expectedStatusCodes:
+      - 200
+    maxResponseTime: 5000
+    __dangerous__body_down_if_text_missing: '"status":"ok"'
+
+assignees:
+  - masterfung
 
 status-website:
-  # Add your custom domain name, or remove the `cname` line if you don't have a domain
-  # Uncomment the `baseUrl` line if you don't have a custom domain and add your repo name there
-  cname: demo.upptime.js.org
-  # baseUrl: /your-repo-name
-  logoUrl: https://raw.githubusercontent.com/upptime/upptime.js.org/master/static/img/icon.svg
-  name: Upptime
-  introTitle: "**Upptime** is the open-source uptime monitor and status page, powered entirely by GitHub."
-  introMessage: This is a sample status page which uses **real-time** data from our [GitHub repository](https://github.com/upptime/upptime). No server required — just GitHub Actions, Issues, and Pages. [**Get your own for free**](https://github.com/upptime/upptime)
+  cname: status.trymighty.ai
+  logoUrl: /mighty-logo.png
+  name: Mighty Status
+  theme: night
+  introTitle: "**Mighty service status**"
+  introMessage: >-
+    Current availability and incident communications for Mighty production
+    services. Measurements are external observations and are not a contractual
+    service-level agreement.
   navbar:
     - title: Status
       href: /
-    - title: GitHub
-      href: https://github.com/$OWNER/$REPO
+    - title: Mighty
+      href: https://trymighty.ai/
+    - title: Documentation
+      href: https://trymighty.ai/docs
+    - title: Security
+      href: https://trymighty.ai/security
 
-# Upptime also supports notifications, assigning issues, and more
-# See https://upptime.js.org/docs/configuration
+workflowSchedule:
+  uptime: "3-58/5 * * * *"
+  responseTime: "43 23 * * *"
+  staticSite: "27 1 * * *"
+
+commitMessages:
+  commitAuthorName: Mighty Status Bot
+  commitAuthorEmail: 73812536+upptime-bot@users.noreply.github.com
+  readmeContent: "chore(status): update summary [skip ci] [upptime]"
+  summaryJson: "chore(status): update status summary [skip ci] [upptime]"
+  statusChange: "$EMOJI $SITE_NAME is $STATUS ($RESPONSE_CODE in $RESPONSE_TIME ms) [skip ci] [upptime]"
+
+i18n:
+  footer: This page is [open source]($REPO) and powered by [Upptime](https://upptime.js.org).
