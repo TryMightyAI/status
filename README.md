@@ -9,8 +9,8 @@ agreement (SLA). Mighty keeps its internal monitoring and incident records as
 the authoritative audit evidence.
 
 [![Validate](https://github.com/TryMightyAI/status/actions/workflows/validate.yml/badge.svg)](https://github.com/TryMightyAI/status/actions/workflows/validate.yml)
-[![Uptime CI](https://github.com/TryMightyAI/status/actions/workflows/uptime.yml/badge.svg)](https://github.com/TryMightyAI/status/actions/workflows/uptime.yml)
-[![Static Site CI](https://github.com/TryMightyAI/status/actions/workflows/site.yml/badge.svg)](https://github.com/TryMightyAI/status/actions/workflows/site.yml)
+[![Uptime CI](https://github.com/TryMightyAI/status/workflows/Uptime%20CI/badge.svg)](https://github.com/TryMightyAI/status/actions/workflows/uptime.yml)
+[![Static Site CI](https://github.com/TryMightyAI/status/workflows/Static%20Site%20CI/badge.svg)](https://github.com/TryMightyAI/status/actions/workflows/site.yml)
 
 ## [Live status](https://status.trymighty.ai)
 
