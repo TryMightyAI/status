@@ -70,3 +70,6 @@ jobs:
           test -s site/__sapper__/export/_headers
           test -f site/__sapper__/export/mighty-logo.png
           test "$(wc -c < site/__sapper__/export/mighty-logo.png)" -gt 1000
+          test -f site/__sapper__/export/favicon.png
+          test "$(wc -c < site/__sapper__/export/favicon.png)" -gt 1000
+          grep -q 'href=/favicon.png' site/__sapper__/export/index.html
