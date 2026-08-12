@@ -72,4 +72,16 @@ jobs:
           test "$(wc -c < site/__sapper__/export/mighty-logo.png)" -gt 1000
           test -f site/__sapper__/export/favicon.png
           test "$(wc -c < site/__sapper__/export/favicon.png)" -gt 1000
+          test -s site/__sapper__/export/mighty-theme.css
+          test -s site/__sapper__/export/status-social-card.png
+          test -s site/__sapper__/export/robots.txt
+          test -s site/__sapper__/export/sitemap.xml
+          test -s site/__sapper__/export/llms.txt
+          grep -q 'Mighty Service Status' site/__sapper__/export/manifest.json
+          grep -q 'content=#fbf7ee' site/__sapper__/export/index.html
           grep -q 'href=/favicon.png' site/__sapper__/export/index.html
+          grep -q 'Mighty detects manipulated documents and media' site/__sapper__/export/index.html
+          grep -q 'application/ld+json' site/__sapper__/export/index.html
+          for component in website api scan-gateway; do
+            test -s "site/__sapper__/export/history/${component}/index.html"
+          done

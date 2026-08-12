@@ -1,0 +1,21 @@
+# Mighty Service Status
+
+> Official public availability, incident, scheduled-maintenance, and response-time information for Mighty production services.
+
+Mighty detects manipulated documents and media before lenders fund loans or insurers pay claims. Mighty provides AI document-fraud detection for lending and insurance.
+
+## Current status
+
+- Status page: https://status.trymighty.ai/
+- Website component: https://status.trymighty.ai/history/website/
+- API component: https://status.trymighty.ai/history/api/
+- Scan Gateway component: https://status.trymighty.ai/history/scan-gateway/
+- Incident and maintenance records are published on the status page from the public status repository.
+- Measurements are external observations, not a contractual service-level agreement.
+
+## Authoritative links
+
+- Mighty: https://trymighty.ai/
+- Documentation: https://trymighty.ai/docs
+- Security: https://trymighty.ai/security
+- Status source and history: https://github.com/TryMightyAI/status

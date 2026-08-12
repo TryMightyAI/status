@@ -1,13 +1,40 @@
+diff --git a/post-process.ts b/post-process.ts
+index 70ea5ab..bf095ab 100644
+--- a/post-process.ts
++++ b/post-process.ts
+@@ -13,7 +13,7 @@ export const postProcess = async () => {
+   } = load(await readFile(join("..", ".upptimerc.yml"), "utf8")) as any;
+   const baseUrl = (config["status-website"] || {}).baseUrl || "/";
+
+-  execSync(`sapper export --legacy --basepath ${baseUrl}`, {
++  execSync(`sapper export --legacy --basepath ${baseUrl} --entry "/ /history/website /history/api /history/scan-gateway"`, {
+     stdio: "inherit",
+   });
+
 diff --git a/src/components/LiveStatus.svelte b/src/components/LiveStatus.svelte
-index 16eec5d..e266005 100644
+index 16eec5d..dd893d6 100644
 --- a/src/components/LiveStatus.svelte
 +++ b/src/components/LiveStatus.svelte
-@@ -17 +16,0 @@
+@@ -14,14 +14,13 @@
+   if (!apiBaseUrl) apiBaseUrl = "https://api.github.com";
+   if (!userContentBaseUrl) userContentBaseUrl = "https://raw.githubusercontent.com";
+
 -  const graphsBaseUrl = `${userContentBaseUrl}/${owner}/${repo}/master/graphs`;
-@@ -24 +23 @@
+   let form = null;
+
+   let selected = "week";
+
+   onMount(async () => {
+     try {
 -      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/master/history/summary.json`);
 +      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/main/history/summary.json`);
-@@ -101,14 +100,2 @@
+       sites = await res.json();
+     } catch (error) {
+       handleError(error);
+@@ -98,20 +97,8 @@
+     <Loading />
+   {:else if sites.length}
+     {#each sites as site}
 -      <article
 -        class={`${site.status} link graph`}
 -        style="--background: url('{`${graphsBaseUrl}/${site.slug}/response-time${
@@ -24,25 +51,74 @@ index 16eec5d..e266005 100644
 -        ><h4>
 +      <article class={`${site.status} link`}>
 +        <h4>
-@@ -156,6 +142,0 @@
+           <img class="icon" alt="" src={site.icon} />
+           <a href={`${config.path}/history/${site.slug}`}>{site.name}</a>
+         </h4>
+@@ -153,12 +140,6 @@
+ </section>
+
+ <style>
 -  article.graph {
 -    background-image: var(--background);
 -    background-size: contain;
 -    background-repeat: no-repeat;
 -    background-position: center right;
 -  }
+   .icon {
+     height: 1rem;
+     margin-right: 0.33rem;
+@@ -172,7 +153,20 @@
+     font-weight: bold;
+   }
+   .r input {
+-    display: none;
++    position: absolute;
++    overflow: hidden;
++    width: 1px;
++    height: 1px;
++    margin: -1px;
++    padding: 0;
++    clip: rect(0 0 0 0);
++    clip-path: inset(50%);
++    white-space: nowrap;
++    border: 0;
++  }
++  .r input:focus-visible + label {
++    outline: 3px solid #127294;
++    outline-offset: 3px;
+   }
+   .r label {
+     margin-left: 1rem;
 diff --git a/src/components/Summary.svelte b/src/components/Summary.svelte
 index 97ee5bc..8f510de 100644
 --- a/src/components/Summary.svelte
 +++ b/src/components/Summary.svelte
-@@ -20 +20 @@
+@@ -17,7 +17,7 @@
+
+   onMount(async () => {
+     try {
 -      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/master/history/summary.json`);
 +      const res = await fetch(`${userContentBaseUrl}/${owner}/${repo}/main/history/summary.json`);
+       summary = (await res.json()).find((item) => item.slug === slug);
+     } catch (error) {
+       handleError(error);
 diff --git a/src/routes/_layout.svelte b/src/routes/_layout.svelte
-index 74c6a4a..2e411f8 100644
+index 74c6a4a..881dc02 100644
 --- a/src/routes/_layout.svelte
 +++ b/src/routes/_layout.svelte
-@@ -45,7 +44,0 @@
+@@ -6,7 +6,7 @@
+ </script>
+
+ <svelte:head>
+-  {#if (config["status-website"] || {}).customHeadHtml}
++  {#if !segment && (config["status-website"] || {}).customHeadHtml}
+     {@html (config["status-website"] || {}).customHeadHtml}
+   {/if}
+   {#if (config["status-website"] || {}).themeUrl}
+@@ -42,17 +42,10 @@
+     />
+   {/if}
+   <link rel="stylesheet" href={`${config.path}/global.css`} />
 -  <link
 -    rel="icon"
 -    type="image/svg"
@@ -50,6 +126,66 @@ index 74c6a4a..2e411f8 100644
 -      (config["status-website"] || {}).favicon ||
 -      `https://raw.githubusercontent.com/upptime/upptime/master/assets/upptime-icon.svg`}
 -  />
-@@ -55 +48 @@
+   <link
+     rel="icon"
+     type="image/png"
 -    href={(config["status-website"] || {}).favicon || `/logo-192.png`}
 +    href={(config["status-website"] || {}).favicon || `/mighty-logo.png`}
+   />
+   {#if (config["status-website"] || {}).scripts}
+     {#each (config["status-website"] || {}).scripts as script}<script
+@@ -61,12 +54,12 @@
+         defer={!!script.async}>
+       </script>{/each}
+   {/if}
+-  {#if (config["status-website"] || {}).links}
++  {#if !segment && (config["status-website"] || {}).links}
+     {#each (config["status-website"] || {}).links as link}
+       <link rel={link.rel} href={link.href} media={link.media} />
+     {/each}
+   {/if}
+-  {#if (config["status-website"] || {}).metaTags}
++  {#if !segment && (config["status-website"] || {}).metaTags}
+     {#each (config["status-website"] || {}).metaTags as link}
+       <meta name={link.name} content={link.content} />
+     {/each}
+diff --git a/src/routes/history/[number].svelte b/src/routes/history/[number].svelte
+index 12438e7..e6d685a 100644
+--- a/src/routes/history/[number].svelte
++++ b/src/routes/history/[number].svelte
+@@ -9,9 +9,22 @@
+   import Summary from "../../components/Summary.svelte";
+   import History from "../../components/History.svelte";
+   import Graph from "../../components/Graph.svelte";
++  import config from "../../data/config.json";
+   export let slug;
++
++  const site = config.sites.find((item) => item.slug === slug);
++  const serviceName = site ? site.name : slug;
+ </script>
+
++<svelte:head>
++  <title>{serviceName} status history | Mighty</title>
++  <meta
++    name="description"
++    content={`Current uptime, response-time history, and past incidents for the Mighty ${serviceName} service.`}
++  />
++  <link rel="canonical" href={`${config.path}/history/${slug}/`} />
++</svelte:head>
++
+ <Summary {slug} />
+ <Graph {slug} />
+ <History {slug} />
+diff --git a/src/template.html b/src/template.html
+index 54f9ea7..93ef009 100644
+--- a/src/template.html
++++ b/src/template.html
+@@ -3,7 +3,7 @@
+   <head>
+     <meta charset="utf-8" />
+     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+-    <meta name="theme-color" content="#333333" />
++    <meta name="theme-color" content="#fbf7ee" />
+     %sapper.base%
+     <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
+     %sapper.scripts% %sapper.styles% %sapper.head%

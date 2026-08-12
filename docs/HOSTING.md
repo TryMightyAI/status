@@ -9,7 +9,9 @@ GitHub Actions (secondary public checks)
         └── gh-pages: generated static website
                            │
                            ▼
-                 Cloudflare Pages + TLS
+             GitHub Pages + GitHub TLS
+                           │
+               Cloudflare DNS-only CNAME
                            │
                     status.trymighty.ai
 
@@ -53,34 +55,22 @@ and the static shell has its own schedule.
 8. Confirm that `history/` and the `gh-pages` branch contain only Mighty data.
    Never import the upstream demo measurements.
 
-## Cloudflare Pages (recommended)
+## Production hosting: GitHub Pages with Cloudflare DNS
 
-Wait until `Static Site CI` creates `gh-pages`, then:
+`Static Site CI` publishes the generated site from `gh-pages`. GitHub Pages
+serves that branch, owns the certificate, and redirects HTTP to HTTPS. Cloudflare
+is DNS-only: `status.trymighty.ai` is a CNAME to `trymightyai.github.io` and is
+not proxied through Cloudflare.
 
-1. In Cloudflare Pages, connect the public `TryMightyAI/status` repository.
-2. Select `gh-pages` as the production branch.
-3. Use no framework preset, no build command, and `.` as the output directory;
-   the branch already contains generated static files.
-4. Expose no build secrets. Restrict the Cloudflare GitHub integration to this
-   repository rather than reusing a broad application API token.
-5. Attach the custom domain `status.trymighty.ai`. When the zone is in the same
-   Cloudflare account, let Pages create the required DNS record and certificate.
-6. Leave Cloudflare Access/password protection **off** for the public page.
-7. Keep the default `*.pages.dev` hostname enabled as an operator diagnostic URL,
-   but publish the GitHub Issues list as the Cloudflare-independent fallback.
+In repository Pages settings, keep the source set to the `gh-pages` branch at
+`/ (root)`, preserve the custom domain `status.trymighty.ai`, and keep HTTPS
+enforcement enabled. Do not enable Cloudflare Pages, Workers, or proxying for the
+same hostname without a reviewed hosting migration.
 
-Cloudflare must deploy after every force/update to `gh-pages`. Validate this with
-a harmless branding pull request before launch. The static shell is rebuilt for
-configuration/branding changes, but live component status, incident comments,
-and scheduled maintenance are fetched from GitHub at page load; an outage update
-does not wait for a Cloudflare rebuild.
-
-## GitHub Pages alternative
-
-If Cloudflare Pages cannot be approved, publish `gh-pages` `/ (root)` with
-GitHub Pages and configure `status.trymighty.ai` as the custom domain. Do not run
-both providers for the same custom hostname. The public repository and Issues
-remain the alternate channel.
+GitHub Pages does not apply the Cloudflare-style rules in `assets/_headers`.
+Those rules remain a reviewed baseline for a future hosting layer, not evidence
+of live response headers. The public repository and Issues are the independent
+fallback if the custom hostname or static page is unavailable.
 
 ## Launch validation
 
@@ -95,29 +85,29 @@ curl --fail --show-error https://gateway.trymighty.ai/health
 
 Also verify:
 
-- valid TLS, automatic HTTP-to-HTTPS redirect, and the security headers from `assets/_headers`;
+- valid TLS and automatic HTTP-to-HTTPS redirect; treat `assets/_headers` as an unapplied baseline while GitHub Pages remains the host;
 - logo, CSS, component history, and incident links;
 - a future UTC maintenance test appears before its start, then moves into past
   history after closing/completion;
 - a repository admin can post an update when the Mighty application and normal
   identity path are assumed unavailable;
-- Cloudflare redeploys an updated `gh-pages` commit;
+- GitHub Pages deploys the updated `gh-pages` commit;
 - the GitHub Issues fallback is documented in the internal incident runbook;
 - private vulnerability reporting works without public disclosure;
 - an external monitor checks the public status page without depending on this
-  repository's scheduler or Cloudflare Pages; and
-- launch screenshots, headers, workflow run URLs, DNS/TLS result, and test Issue
-  export are saved to the approved evidence store.
+  repository's scheduler or GitHub Pages; and
+- launch screenshots, response headers, workflow run URLs, DNS/TLS result, and
+  test Issue export are saved to the approved evidence store.
 
 Do not claim the status-page control is operating until this test is complete.
 
 ## Ongoing hosting controls
 
-- Monitor the status page itself from a service that does not depend on
-  Cloudflare Pages or this repository's scheduler.
+- Monitor the status page itself from a service that does not depend on GitHub
+  Pages or this repository's scheduler.
 - Review repository access and workflow job permissions at the organization’s
   approved cadence; remove leavers promptly.
-- Review Cloudflare Pages project access and deployment history.
+- Review GitHub Pages settings and deployment history.
 - Export the repository and Issue/comment audit population for each SOC 2
   review period. A screenshot alone is weak evidence.
 - Test the alternate publishing path at least annually and after material
