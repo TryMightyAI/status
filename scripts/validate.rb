@@ -21,6 +21,7 @@ check(config["skipDeleteIssues"] == true, "short incidents must be retained")
 end
 check(config.dig("status-website", "cname") == "status.trymighty.ai", "custom domain changed")
 check(config.dig("status-website", "logoUrl") == "/mighty-logo.png", "logo must be served with the static page")
+check(config.dig("status-website", "favicon") == "/favicon.png", "favicon must use the square asset")
 
 sites = config.fetch("sites", [])
 check(sites.length >= 3, "at least three customer-facing components are required")

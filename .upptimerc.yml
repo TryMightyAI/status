@@ -45,6 +45,7 @@ assignees:
 status-website:
   cname: status.trymighty.ai
   logoUrl: /mighty-logo.png
+  favicon: /favicon.png
   name: Mighty Status
   theme: night
   introTitle: "**Mighty service status**"
