@@ -1,8 +1,9 @@
 {
-  "background_color": "#ffffff",
-  "theme_color": "#333333",
-  "name": "Upptime",
-  "short_name": "Upptime",
+  "background_color": "#fbf7ee",
+  "theme_color": "#fbf7ee",
+  "name": "Mighty Service Status",
+  "short_name": "Mighty Status",
+  "description": "Live availability and incident updates for Mighty production services.",
   "display": "minimal-ui",
   "start_url": "/",
   "icons": [
