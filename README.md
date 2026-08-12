@@ -14,8 +14,8 @@ the authoritative audit evidence.
 
 ## [Live status](https://status.trymighty.ai)
 
-Availability measurements begin when the launch checklist enables production
-automation. No historical sample data is carried over from the upstream template.
+Production availability measurements and response-time history are collected
+automatically. No historical sample data was carried over from the upstream template.
 
 ## Operations
 

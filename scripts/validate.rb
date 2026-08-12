@@ -22,6 +22,27 @@ end
 check(config.dig("status-website", "cname") == "status.trymighty.ai", "custom domain changed")
 check(config.dig("status-website", "logoUrl") == "/mighty-logo.png", "logo must be served with the static page")
 check(config.dig("status-website", "favicon") == "/favicon.png", "favicon must use the square asset")
+check(config.dig("status-website", "themeUrl") == "/mighty-theme.css", "custom Mighty theme must remain enabled")
+check(config.dig("status-website", "name") == "Mighty Service Status", "status page needs a descriptive title")
+check(config.dig("status-website", "introMessage").to_s.include?("Mighty detects manipulated documents and media"),
+      "status page must explain Mighty's product in plain language")
+check(config.dig("status-website", "links").to_a.any? { |link| link == { "rel" => "canonical", "href" => "https://status.trymighty.ai/" } },
+      "status page must publish its canonical URL")
+meta_tags = config.dig("status-website", "metaTags").to_a
+check(meta_tags.any? { |tag| tag["name"] == "description" && tag["content"].to_s.include?("AI document-fraud detection") },
+      "status page must publish an accurate search description")
+check(config.dig("status-website", "customHeadHtml").to_s.include?("application/ld+json"),
+      "status page must publish structured data")
+check(config.dig("status-website", "robotsText").to_s.include?("https://status.trymighty.ai/sitemap.xml"),
+      "robots.txt must advertise the sitemap")
+%w[mighty-theme.css status-social-card.png sitemap.xml llms.txt manifest.json logo-192.png logo-512.png].each do |asset|
+  path = File.join("assets", asset)
+  check(File.file?(path) && File.size(path).positive?, "missing status presentation/discovery asset #{asset}")
+end
+
+theme_css = File.read("assets/mighty-theme.css")
+check(theme_css.include?("outline: 3px solid #127294"),
+      "interactive elements must retain a high-contrast keyboard focus indicator")
 
 sites = config.fetch("sites", [])
 check(sites.length >= 3, "at least three customer-facing components are required")
@@ -94,8 +115,16 @@ check(site_content.include?("npm ci --no-audit --no-fund"),
       "static site must use its upstream package lock")
 check(!site_content.include?("command: site"),
       "do not use Upptime's floating npm status-page install")
-check(File.read("patches/upptime-status-page-main.patch").scan("/master/").length == 4,
+status_page_patch = File.read("patches/upptime-status-page-main.patch")
+check(status_page_patch.scan("/master/").length == 4,
       "main-branch compatibility patch changed unexpectedly")
+check(status_page_patch.include?("<title>{serviceName} status history | Mighty</title>"),
+      "component history pages must publish descriptive titles")
+check(status_page_patch.include?(".r input:focus-visible + label") &&
+      !status_page_patch.include?("+    display: none;"),
+      "time-range radio controls must remain keyboard accessible")
+check(status_page_patch.include?('--entry "/ /history/website /history/api /history/scan-gateway"'),
+      "static export must emit direct HTTP-200 component history routes")
 
 %w[uptime.yml response-time.yml].each do |name|
   content = File.read(File.join(workflow_dir, name))

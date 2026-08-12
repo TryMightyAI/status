@@ -2,7 +2,8 @@
 
 **Decision date:** 2026-08-11
 **Decision:** Upptime in a dedicated public repository, with the generated site
-served from Cloudflare Pages at `status.trymighty.ai`.
+served from GitHub Pages at `status.trymighty.ai` and Cloudflare providing
+DNS-only resolution.
 
 ## Requirements
 
@@ -40,8 +41,8 @@ Upptime maps the public operating workflow onto tools Mighty already reviews:
   monitoring, and resolved updates.
 - Maintenance is an Issue with explicit UTC start/end metadata.
 - Git stores check history and reviewed configuration.
-- A static site is generated onto `gh-pages` and can be served by Cloudflare
-  Pages without an application server or database.
+- A static site is generated onto `gh-pages` and served by GitHub Pages without
+  an application server or database.
 
 This repository deliberately changes two upstream defaults. Short incidents are
 **not deleted** (`skipDeleteIssues: true`), and self-updating workflows are
@@ -50,14 +51,13 @@ through review.
 
 ## Hosting decision
 
-Cloudflare Pages should serve the already-generated `gh-pages` branch. It gives
-Mighty a static global edge site and managed TLS outside the GCP production
-stack. Use the Cloudflare Git integration restricted to this public repository;
-do not put a broad Cloudflare API token in GitHub Actions. GitHub Pages is an
-acceptable fallback host if the Pages integration cannot be approved.
+GitHub Pages serves the already-generated `gh-pages` branch and manages TLS
+outside the GCP production stack. Cloudflare provides a DNS-only CNAME from
+`status.trymighty.ai` to `trymightyai.github.io`; there is no Cloudflare Pages
+project, Worker, proxy, or API token in the publication path.
 
 The public GitHub Issues list is the alternate communications URL if the custom
-domain or Cloudflare is unavailable. This is not complete independence—Upptime
+domain or static page is unavailable. This is not complete independence—Upptime
 still uses GitHub for checks and incident data—so Mighty’s existing internal
 monitoring remains the source for paging and audit evidence. The page is a
 communication layer and an independent secondary observation.
