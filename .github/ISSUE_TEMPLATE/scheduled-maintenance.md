@@ -7,17 +7,18 @@ assignees: ""
 ---
 
 > **Required:** Replace both 2000 timestamps with the approved UTC start/end.
-> List only genuinely affected slugs after `expectedDown` or
-> `expectedDegraded`; leave the value empty when that impact is not expected.
+> Add `expectedDown` or `expectedDegraded` inside the metadata comment only
+> when that impact is expected. Never leave either key with an empty value;
+> the pinned monitor cannot parse an empty `key:` line.
 
 <!--
 start: 2000-01-01T00:00:00Z
 end: 2000-01-01T00:30:00Z
-expectedDown:
-expectedDegraded:
 -->
 
 Valid component slugs: `website`, `api`, `scan-gateway`.
+Optional metadata examples: `expectedDown: api` and
+`expectedDegraded: website, scan-gateway`.
 
 ## Summary
 
