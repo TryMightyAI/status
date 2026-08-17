@@ -165,8 +165,14 @@ check(first_metadata.include?("start: 2000-01-01T00:00:00Z"),
       "first maintenance comment needs a safe start placeholder")
 check(first_metadata.include?("end: 2000-01-01T00:30:00Z"),
       "first maintenance comment needs a safe end placeholder")
-check(first_metadata.include?("expectedDown:") && first_metadata.include?("expectedDegraded:"),
-      "first maintenance comment needs optional impact metadata")
+blank_impact_metadata = first_metadata.lines.any? do |line|
+  line.match?(/^\s*expected(?:Down|Degraded):\s*$/)
+end
+check(!blank_impact_metadata,
+      "maintenance metadata must not contain blank expectedDown/expectedDegraded values")
+check(issue_template.include?("expectedDown: api") &&
+      issue_template.include?("expectedDegraded: website, scan-gateway"),
+      "maintenance template needs safe optional impact examples")
 
 if ERRORS.empty?
   puts "Status configuration validation passed (#{sites.length} components, full-SHA workflows)."
